@@ -1,33 +1,26 @@
-import { Component } from '@angular/core';
-import { map } from 'rxjs/operators';
-import { Breakpoints, BreakpointObserver } from '@angular/cdk/layout';
+import { Component, OnInit } from '@angular/core';
+import { Observable } from 'rxjs';
+import { GithubRepo, GithubService, GithubUser } from 'src/app/shared';
 
 @Component({
   selector: 'app-github-user',
   templateUrl: './github-user.component.html',
   styleUrls: ['./github-user.component.scss']
 })
-export class GithubUserComponent {
-  /** Based on the screen size, switch from standard to one column per row */
-  cards = this.breakpointObserver.observe(Breakpoints.Handset).pipe(
-    map(({ matches }) => {
-      if (matches) {
-        return [
-          { title: 'Card 1', cols: 1, rows: 1 },
-          { title: 'Card 2', cols: 1, rows: 1 },
-          { title: 'Card 3', cols: 1, rows: 1 },
-          { title: 'Card 4', cols: 1, rows: 1 }
-        ];
-      }
+export class GithubUserComponent implements OnInit {
+  public $gitHubUser: Observable<GithubUser>;
+  public $repos: Observable<GithubRepo[]>;
+  constructor(private gitHubService: GithubService) {}
 
-      return [
-        { title: 'Card 1', cols: 2, rows: 1 },
-        { title: 'Card 2', cols: 1, rows: 1 },
-        { title: 'Card 3', cols: 1, rows: 2 },
-        { title: 'Card 4', cols: 1, rows: 1 }
-      ];
-    })
-  );
+  public ngOnInit() {
+    
+  }
 
-  constructor(private breakpointObserver: BreakpointObserver) {}
+  public getUser(user: string) {
+    this.$gitHubUser = this.gitHubService.getGithubUser(user);
+  }
+
+  public getRepos(user: string) {
+    this.$repos = this.gitHubService.getUserRepos(user);
+  }
 }

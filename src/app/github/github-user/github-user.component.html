@@ -1,24 +1,61 @@
-<div class="grid-container">
-  <h1 class="mat-h1">Dashboard</h1>
-  <mat-grid-list cols="2" rowHeight="350px">
-    <mat-grid-tile *ngFor="let card of cards | async" [colspan]="card.cols" [rowspan]="card.rows">
-      <mat-card class="dashboard-card">
-        <mat-card-header>
-          <mat-card-title>
-            {{card.title}}
-            <button mat-icon-button class="more-button" [matMenuTriggerFor]="menu" aria-label="Toggle menu">
-              <mat-icon>more_vert</mat-icon>
-            </button>
-            <mat-menu #menu="matMenu" xPosition="before">
-              <button mat-menu-item>Expand</button>
-              <button mat-menu-item>Remove</button>
-            </mat-menu>
-          </mat-card-title>
-        </mat-card-header>
-        <mat-card-content class="dashboard-card-content">
-          <div>Card Content Here</div>
-        </mat-card-content>
-      </mat-card>
-    </mat-grid-tile>
-  </mat-grid-list>
+<div class="github-user-container">
+  <h1 class="mat-h1">GitHub User</h1>
+
+  <div class="input-container">
+    <mat-form-field appearance="outline">
+      <mat-label>GutHub User</mat-label>
+      <input #login matInput placeholder="Put user login">
+      <mat-icon matSuffix>perm_identity</mat-icon>
+    </mat-form-field>
+  </div>
+
+  <div class="button-container">
+    <button mat-raised-button color="accent" (click)="getUser(login.value)" [disabled]="!login?.value?.length">Get
+      User</button>
+  </div>
+
+  <mat-card class="github-user-card" *ngIf="$gitHubUser | async as user">
+    <mat-card-header>
+      <div mat-card-avatar class="header-image"><img [src]="user.avatar_url"></div>
+      <mat-card-title>{{user.name}}</mat-card-title>
+      <mat-card-subtitle>{{user.login}}</mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content>
+      <p>
+        {{user.bio}}
+      </p>
+      <p>
+        {{user.company}}, {{user.location}}
+      </p>
+      <p>
+        Joined at {{user.created_at | date}}
+      </p>
+    </mat-card-content>
+    <mat-card-actions>
+      <button mat-raised-button color="primary" [matBadge]="user.public_repos" matBadgePosition="after"
+        matBadgeColor="accent" (click)="getRepos(user.login)">Show Repositories</button>
+    </mat-card-actions>
+  </mat-card>
+
+  <div class="repos-container">
+    <mat-card class="repo-card" *ngFor="let repo of $repos | async">
+      <mat-card-header>
+        <mat-card-title>{{repo.name}}</mat-card-title>
+        <mat-card-subtitle> <a [href]="repo.html_url">{{repo.full_name}}</a></mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content flex>
+        <p>{{repo.description}}</p>
+        <mat-chip-list>
+          <mat-chip color="accent" selected>
+            {{repo.language}}
+          </mat-chip>
+        </mat-chip-list>        
+      </mat-card-content>
+      <mat-card-actions>
+          <mat-icon [matBadge]="repo.stargazers_count" matBadgeSize="small" matBadgeColor="accent">star_rate</mat-icon>
+          <mat-icon [matBadge]="repo.watchers_count" matBadgeSize="small" matBadgeColor="accent">visibility</mat-icon>
+          <p>Create at {{repo.created_at | date}}</p>
+        </mat-card-actions>
+    </mat-card>
+  </div>
 </div>
