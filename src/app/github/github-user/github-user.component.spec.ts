@@ -7,13 +7,16 @@ import { MatGridListModule } from '@angular/material/grid-list';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 
+import { GithubService } from 'src/app/shared';
 import { GithubUserComponent } from './github-user.component';
 
 describe('GithubUserComponent', () => {
   let component: GithubUserComponent;
   let fixture: ComponentFixture<GithubUserComponent>;
+  let githubServiceSpy: jasmine.SpyObj<GithubService>;
 
   beforeEach(waitForAsync(() => {
+    const spy = jasmine.createSpyObj('GithubService', ['getGithubUser', 'getUserRepos']);
     TestBed.configureTestingModule({
       declarations: [GithubUserComponent],
       imports: [
@@ -24,8 +27,10 @@ describe('GithubUserComponent', () => {
         MatGridListModule,
         MatIconModule,
         MatMenuModule,
-      ]
+      ],
+      providers: [{provide: GithubService, useValue: spy}]
     }).compileComponents();
+    githubServiceSpy = TestBed.inject(GithubService) as jasmine.SpyObj<GithubService>;
   }));
 
   beforeEach(() => {
