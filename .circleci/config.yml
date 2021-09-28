@@ -1,9 +1,9 @@
 version: 2
 jobs:
-  build:
+  test:
     working_directory: ~/feature-project
     docker:
-      - image: circleci/node:14-browsers
+      - image: circleci/node:16-browsers
     steps:
       - checkout
       - restore_cache:
@@ -14,3 +14,58 @@ jobs:
           paths:
             - "node_modules"
       - run: npm run test -- --no-watch --no-progress --browsers=ChromeHeadlessCI
+
+  build:
+    working_directory: ~/feature-project
+    docker:
+      - image: cimg/node:16.9.1-browsers
+    steps:
+      - checkout
+      - restore_cache:
+          key: feature-project-{{ .Branch }}-{{ checksum "package-lock.json" }}
+      - run: npm install
+      - save_cache:
+          key: feature-project-{{ .Branch }}-{{ checksum "package-lock.json" }}
+          paths:
+            - "node_modules"
+      - run: npm run build:gh-pages
+      - persist_to_workspace:
+          root: dist
+          paths: feature
+
+  deploy:
+    docker:
+      - image: node:8.10.0
+    steps:
+      - checkout
+      - attach_workspace:
+          at: dist
+      - run:
+          name: Disable jekyll builds
+          command: touch dist/feature/.nojekyll
+      - run:
+          name: Install and configure dependencies
+          command: |
+            npm install -g --silent gh-pages@2.0.1
+            git config user.email "bodyart3003@gmail.com"
+            git config user.name "Oleksii Oleksiv"
+      - add_ssh_keys:
+          fingerprints:
+            - "62:d7:d5:a0:e5:41:ad:76:2c:d1:17:91:e2:7b:68:6e"
+      - run:
+          name: Deploy app to gh-pages branch
+          command: gh-pages --dotfiles --message "[skip ci] Updates" --dist dist/feature
+
+workflows:
+  version: 2
+  build:
+    jobs:
+      - test
+      - build
+      - deploy:
+          requires:
+            - test
+            - build
+          filters:
+            branches:
+              only: main
