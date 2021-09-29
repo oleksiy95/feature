@@ -1,8 +1,7 @@
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
-import { NotificationService } from './notification.service';
-import { ApiService } from './api.service';
+import { ApiService, NotificationService } from 'src/app/shared';
 
 interface Data {
   name: string;
@@ -40,6 +39,18 @@ describe('ApiService', () => {
     expect(req.request.method).toEqual('GET');
     req.flush(testData);
     httpTestingController.verify();
+  });
+
+  it('it should make GET http request with matching header', () => {
+    const testData: Data = { name: 'Test Data' };
+
+    // Make an HTTP GET request with specific header
+    api.get<Data>(testUrl, new HttpHeaders({ Authorization: 'my-auth-token' })).subscribe(data => expect(data).toEqual(testData));
+
+    const req = httpTestingController.expectOne(
+      request => request.headers.has('Authorization')
+    );
+    req.flush(testData);
   });
 
   it('it should make POST http request', () => {

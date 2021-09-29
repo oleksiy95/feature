@@ -1,0 +1,16 @@
+.mat-snack-bar-container {
+    &.notification-success {
+        background-color: #52c41a;
+        color: white;
+    }
+
+    &.notification-warning{
+        background-color: #faad14;
+        color: white;
+    }
+
+    &.notification-error {
+        background-color: #ff4d4f;
+        color: white;
+    }
+}
