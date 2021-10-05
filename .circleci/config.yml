@@ -1,4 +1,7 @@
 version: 2
+orbs:
+  cypress: cypress-io/cypress@1
+
 jobs:
   test:
     working_directory: ~/feature-project
@@ -62,10 +65,12 @@ workflows:
     jobs:
       - test
       - build
+      - cypress/run
       - deploy:
           requires:
             - test
             - build
+            - cypress/run
           filters:
             branches:
               only: main
